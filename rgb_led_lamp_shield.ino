@@ -1,3 +1,4 @@
+// digital pwm outputs for leds
 const int REDPin = 3;    // RED pin of the LED to PWM pin 4 
 const int GREENPin = 5;  // GREEN pin of the LED to PWM pin 5
 const int BLUEPin = 6;   // BLUE pin of the LED to PWM pin 6
@@ -10,13 +11,19 @@ int brightnessRed = 0; // LED brightness
 int brightnessGreen = 0; // LED brightness
 int brightnessBlue = 0; // LED brightness
 
+// analog inputs
 const int redPot = 0;
 const int greenPot = 1;
 const int bluePot = 2;
 
+// electronic brick analog light sensor (seeed studio)
+const int lightsensor = 3;
+
 int rVal = 0;
 int gVal = 0;
 int bVal = 0;
+int lightVal = 0;
+
 boolean on = false;
 boolean previousState = false;
 String onStr = "";
@@ -45,31 +52,12 @@ void loop()
   rVal = analogRead(redPot);
   gVal = analogRead(greenPot);
   bVal = analogRead(bluePot);
-
-  // read the pushbutton input pin:
-  buttonState = digitalRead(buttonPin);
-
-  // compare the buttonState to its previous state
-  if (buttonState != lastButtonState) {
-    // if the state has changed, increment the counter
-    if (buttonState == HIGH) {
-      // if the current state is HIGH then the button
-      // wend from off to on:
-      buttonPushCounter++;
-      Serial.print("number of button pushes:  ");
-      Serial.println(buttonPushCounter, DEC);
-    } 
-    else {
-      // if the current state is LOW then the button
-      // wend from on to off:
-      toggle();
-      Serial.print("toggled: "); 
-      Serial.println(onStr); 
-    }
-  }
-  // save the current state as the last state, 
-  //for next time through the loop
-  lastButtonState = buttonState;
+  lightVal = analogRead(lightsensor);
+  
+  if (lightVal < 100)
+    on = true;
+  else
+    on = false;
 
   if (on) {
     fadeOn();
@@ -84,21 +72,6 @@ void loop()
   analogWrite(REDPin2, brightnessRed);
   analogWrite(GREENPin2, brightnessGreen);
   analogWrite(BLUEPin2, brightnessBlue);
-}
-
-void toggle(){
-  //toggle on or off
-  on = !on;
-  //save the previous state
-  previousState = on;
-
-  //strings
-  if (on){
-    onStr = "On";
-  } 
-  else {
-    onStr = "Off";
-  }
 }
 
 void fadeOn(){
